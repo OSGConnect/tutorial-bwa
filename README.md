@@ -1,6 +1,6 @@
 
 # Introduction
-This tutorial will is based off of the (Data Carpentry Genomics workshop curriculum)[https://datacarpentry.org/genomics-workshop/]. This tutorial focuses on a subset of the Data Carpentry workshop - specifically, this page cover's how to run a BWA workflow on OSG resources. It will use the same general flow as the BWA segment of the Data Carpentry workshop with minor adjustments. The goal of this tutorial is to learn how to convert an existing BWA workflow to run on the OS Pool.  
+This tutorial focuses on a subset of the (Data Carpentry Genomics workshop curriculum)[https://datacarpentry.org/genomics-workshop/] - specifically, this page cover's how to run a BWA workflow on OSG resources. It will use the same general flow as the BWA segment of the Data Carpentry workshop with minor adjustments. The goal of this tutorial is to learn how to convert an existing BWA workflow to run on the OS Pool.  
 
 # Install and prepare BWA
 First, we need to install BWA, also called Burrows-Wheeler Aligner. To do this, we will create and navigate to a new folder in our /home directory called `software`. We will then follow the creator's instructions (https://github.com/lh3/bwa) for using `git clone` to clone the software and then build the tool using `make`. 
