@@ -4,6 +4,7 @@
 # Introduction
 This tutorial focuses on a subset of the [Data Carpentry Genomics workshop curriculum](https://datacarpentry.org/genomics-workshop/) - specifically, this page cover's how to run a BWA workflow on OSG resources. It will use the same general flow as the BWA segment of the Data Carpentry workshop with minor adjustments. The goal of this tutorial is to learn how to convert an existing BWA workflow to run on the OS Pool.  
 
+
 # Install and Prepare BWA
 First, we need to install BWA, also called Burrows-Wheeler Aligner. To do this, we will create and navigate to a new folder in our /home directory called `software`. We will then follow the creator's instructions (https://github.com/lh3/bwa) for using `git clone` to clone the software and then build the tool using `make`. 
 
@@ -36,6 +37,7 @@ Command: index         index sequences in the FASTA format
 ...
 
 ```
+
 Now that we have successfully installed `bwa`, we will create a portable compressed tarball of this software so that it is smaller and quicker to transport when we submit our jobs to the OS Pool. 
 
 ```
@@ -43,6 +45,7 @@ tar -czvf bwa.tar.gz bwa
 ```
 
 Checking the size of this compressed tarball using `ls -lh bwa.tar.gz` reveals the file is 3.5MB, which means it should stay in /home. 
+
 
 # Download Data to Analyze
 Now that we have installed BWA, we need to download data to analyze. For this tutorial, we will be downloading data used in the Data Carpentry workshop. This data includes both the genome of Escherichia coli (E. coli) and paired-end RNA sequencing reads obtained from a study carried out by Zachary D. Blount, Christina Z. Borland, and Richard E. Lenski published in [PNAS](http://www.pnas.org/content/105/23/7899). Additional information about how the data was modified in preparation for this analysis can be found on the [Data Carpentry's workshop website](https://datacarpentry.org/wrangling-genomics/aio.html).
@@ -67,6 +70,7 @@ tar xvf sub.tar.gz
 mv sub/ ~/data/trimmed_fastq_small
 rm sub.tar.gz
 ```
+
 
 # Run a Single Test Job
 Now that we have all items in our analysis ready, it is time to submit a single test job to map our RNA reads to the E. coli genome. For a single test job, we will choose a single sample to analyze. In the following example, we will analyze the forward and reverse reads of both the forward and reverse reads of SRR2584863. An example submit file for this test job may be called `bwa-test.sub` and may look like: 
@@ -140,7 +144,9 @@ For example, when we investigate the `bwa_test_job.log` file created in this ana
            Disk (KB)            :   253770  1048576  27945123 
            Memory (MB)          :      144     2048      2500
 ```
+
 Here we see that we used less than half of both the disk space and memory we requested. In future jobs, we could request a smaller amount of each resource, such as 0.5 GB of disk space and 0.5 GB of memory. We should run additional test jobs using these resource requests to ensure that they will allow our job to complete successfully before scaling up our analysis. 
+
 
 # Scaling Up to Analyze Multiple Samples
 In preparation for scaling up, please review our [guide on how to scale up after a successful test job](https://support.opensciencegrid.org/support/solutions/articles/12000076552-scaling-up-after-success-with-test-jobs) and how to 
@@ -148,7 +154,7 @@ In preparation for scaling up, please review our [guide on how to scale up after
 
 After reviewing how to submit multiple jobs with a single submit file, we see that an option for scaling up our analysis is to use `queue <var> from <list.txt>`. 
 
-To use this option, we first need to create a file with just the names of our samples that we want to analyze and to cut all information after the "_" to remove the forward/reverse read information and file extensions. We will save the sample names in a file called `samples.txt`. 
+To use this option, we first need to create a file with just the names of our samples that we want to analyze and to cut all information after the "_" symbol to remove the forward/reverse read information and file extensions. We will save the sample names in a file called `samples.txt`. 
 
 ```
 cd data/trimmed_fastq_small/
@@ -157,6 +163,7 @@ cd ~
 ```
 
 Now, we can update or create a new submit file to queue a new job for each sample. 
+
 ```
 universe        = vanilla     
 executable      = bwa-alignment.sh
@@ -224,7 +231,7 @@ Once ready, we can submit our job to HTCondor by using `condor_submit bwa-alignm
 
 When we type `condor_q`, we see that three jobs have entered the queue (one for each of our three experimental samples).
 
-Once our jobs have completed, we can type 
+When our jobs have completed, we can type 
 
 ```
 cd ~
@@ -237,7 +244,7 @@ To move all our alignment results files into a single directory, we can type
 
 ```
 mkdir results
-mv *alignment.sam results
+mv *aligned.sam results
 ```
 
 For more information about running bioinformatics workflows on the OSG, we recommend our [BLAST tutorial](https://support.opensciencegrid.org/support/solutions/articles/12000062020-running-a-blast-workflow) as well as our [Samtools](https://support.opensciencegrid.org/support/solutions/articles/12000074984-example-software-compilation) instillation guide. 
