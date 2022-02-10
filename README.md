@@ -1,6 +1,6 @@
 
 # Introduction
-This tutorial focuses on a subset of the (Data Carpentry Genomics workshop curriculum)[https://datacarpentry.org/genomics-workshop/] - specifically, this page cover's how to run a BWA workflow on OSG resources. It will use the same general flow as the BWA segment of the Data Carpentry workshop with minor adjustments. The goal of this tutorial is to learn how to convert an existing BWA workflow to run on the OS Pool.  
+This tutorial focuses on a subset of the [Data Carpentry Genomics workshop curriculum](https://datacarpentry.org/genomics-workshop/) - specifically, this page cover's how to run a BWA workflow on OSG resources. It will use the same general flow as the BWA segment of the Data Carpentry workshop with minor adjustments. The goal of this tutorial is to learn how to convert an existing BWA workflow to run on the OS Pool.  
 
 # Install and prepare BWA
 First, we need to install BWA, also called Burrows-Wheeler Aligner. To do this, we will create and navigate to a new folder in our /home directory called `software`. We will then follow the creator's instructions (https://github.com/lh3/bwa) for using `git clone` to clone the software and then build the tool using `make`. 
@@ -76,6 +76,7 @@ executable	= bwa-test.sh
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 requirements = (OSGVO_OS_STRING == "RHEL 7")
++JobDurationCategory = “Medium”
 
 transfer_input_files = software/bwa.tar.gz, data/ref_genome/ecoli_rel606.fasta.gz, data/trimmed_fastq_small/SRR2584863_1.trim.sub.fastq, data/trimmed_fastq_small/SRR2584863_2.trim.sub.fastq
 
@@ -130,9 +131,10 @@ To check the status of the job, we can use `condor_q`.
 Upon the completion of the test job, we should investigate the output to ensure that it is what we expected and also review the `.log` file to help optimize future resource requests in preparation for scaling up. 
 
 # Scaling Up
-In preparation for scaling up, please review our [scaling up guide](insert-url).
+In preparation for scaling up, please review our [guide on how to scale up after a sucessful test job](https://support.opensciencegrid.org/support/solutions/articles/12000076552-scaling-up-after-success-with-test-jobs) and how to 
+[easily submit multiple jobs with a single submit file](https://support.opensciencegrid.org/support/solutions/articles/12000073165-easily-submit-multiple-jobs)
 
-After reviewing this guide, we see that an option for scaling up our analysis is to use `queue <var> from <list.txt>`. 
+After reviewing how to submit multiple jobs with a single submit file, we see that an option for scaling up our analysis is to use `queue <var> from <list.txt>`. 
 
 To use this option, we first need to create a file with just the names of our samples that we want to analyze and to cut all information after the "_" to remove the forward/reverse read information and file extensions. We will save the sample names in a file called `samples.txt`. 
 
@@ -150,6 +152,7 @@ executable      = bwa-alignment.sh
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 requirements = (OSGVO_OS_STRING == "RHEL 7")
++JobDurationCategory = “Medium”
 
 transfer_input_files = software/bwa.tar.gz, data/ref_genome/ecoli_rel606.fasta.gz, data/trimmed_fastq_small/$(sample)_1.trim.sub.fastq, data/trimmed_fastq_small/$(sample)_2.trim.sub.fastq
 
