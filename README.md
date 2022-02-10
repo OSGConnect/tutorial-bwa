@@ -41,23 +41,25 @@ Command: index         index sequences in the FASTA format
 Now that we have successfully installed `bwa`, we will create a portable compressed tarball of this software so that it is smaller and quicker to transport when we submit our jobs to the OS Pool. 
 
 ```
+cd ~/software
 tar -czvf bwa.tar.gz bwa
 ```
 
-Checking the size of this compressed tarball using `ls -lh bwa.tar.gz` reveals the file is 3.5MB, which means it should stay in /home. 
+Checking the size of this compressed tarball using `ls -lh bwa.tar.gz` reveals the file is approximately 4MB, which means it should stay in /home. 
 
 
 # Download Data to Analyze
 Now that we have installed BWA, we need to download data to analyze. For this tutorial, we will be downloading data used in the Data Carpentry workshop. This data includes both the genome of Escherichia coli (E. coli) and paired-end RNA sequencing reads obtained from a study carried out by Zachary D. Blount, Christina Z. Borland, and Richard E. Lenski published in [PNAS](http://www.pnas.org/content/105/23/7899). Additional information about how the data was modified in preparation for this analysis can be found on the [Data Carpentry's workshop website](https://datacarpentry.org/wrangling-genomics/aio.html).
 
 ``` 
+cd ~
 mkdir -p data/ref_genome
 curl -L -o data/ref_genome/ecoli_rel606.fasta.gz ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/017/985/GCA_000017985.1_ASM1798v1/GCA_000017985.1_ASM1798v1_genomic.fna.gz
 ```
 Investigating the size of the downloaded genome by typing:
 
 ```
-ls -lah data/ref_genome/
+ls -lh data/ref_genome/
 ```
 
 reveals the file is 1.4 MB. Therefore, this file should remain in /home and does not need to be moved to /public. 
@@ -77,20 +79,20 @@ Now that we have all items in our analysis ready, it is time to submit a single 
 
 ```
 universe    = vanilla
-executable	= bwa-test.sh
+executable  = bwa-test.sh
 
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 requirements = (OSGVO_OS_STRING == "RHEL 7")
-+JobDurationCategory = “Medium”
++JobDurationCategory = "Medium"
 
 transfer_input_files = software/bwa.tar.gz, data/ref_genome/ecoli_rel606.fasta.gz, data/trimmed_fastq_small/SRR2584863_1.trim.sub.fastq, data/trimmed_fastq_small/SRR2584863_2.trim.sub.fastq
 
 # arguments = 
 
-log         = bwa_test_job.log
-output      = bwa_test_job.out
-error       = bwa_test_job.error
+log         = TestJobOutput/bwa_test_job.log
+output      = TestJobOutput/bwa_test_job.out
+error       = TestJobOutput/bwa_test_job.error
 
 request_cpus    = 1
 request_memory  = 2GB
@@ -98,7 +100,9 @@ request_disk    = 1GB
 
 queue 1
 ```
-While the script for this analysis could be called `bwa-test.sh` and may look like: 
+You will notice that the .log, .out, and .error files will be saved to a folder called `TestJobOutput`. We need to create this folder using `mkdir TestJobOutput` before we submit our job. 
+
+We will call the script for this analysis `bwa-test.sh` and should contain the following information: 
 
 ```
 #!/bin/bash
@@ -114,11 +118,11 @@ echo "Indexing E. coli genome"
 bwa index ecoli_rel606.fasta.gz
 
 echo "Starting bwa alignment for SRR2584863"
-bwa mem ecoli_rel606.fasta.gz SRR2584863_1.trim.sub.fastq $SRR2584863_2.trim.sub.fastq > SRR2584863.aligned.sam
+bwa mem ecoli_rel606.fasta.gz SRR2584863_1.trim.sub.fastq SRR2584863_2.trim.sub.fastq > SRR2584863.aligned.sam
 
 echo "Done with bwa alignment for SRR2584863!"
 
-echo "Cleaning up files generated from genome indexing "
+echo "Cleaning up files generated from genome indexing"
 rm ecoli_rel606.fasta.gz.amb
 rm ecoli_rel606.fasta.gz.ann
 rm ecoli_rel606.fasta.gz.bwt
@@ -158,11 +162,11 @@ To use this option, we first need to create a file with just the names of our sa
 
 ```
 cd data/trimmed_fastq_small/
-cut -f 1 -d '_' reads.txt | uniq > samples.txt
+ls *.fastq | cut -f 1 -d '_' | uniq > samples.txt
 cd ~
 ```
 
-Now, we can update or create a new submit file to queue a new job for each sample. 
+Now, we can create a new submit file called `bwa-alignment.sub` to queue a new job for each sample. 
 
 ```
 universe        = vanilla     
@@ -171,7 +175,7 @@ executable      = bwa-alignment.sh
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 requirements = (OSGVO_OS_STRING == "RHEL 7")
-+JobDurationCategory = “Medium”
++JobDurationCategory = "Medium"
 
 transfer_input_files = software/bwa.tar.gz, data/ref_genome/ecoli_rel606.fasta.gz, data/trimmed_fastq_small/$(sample)_1.trim.sub.fastq, data/trimmed_fastq_small/$(sample)_2.trim.sub.fastq
 
@@ -185,7 +189,7 @@ request_cpus    = 1
 request_memory  = 0.5GB
 request_disk    = 0.5GB
 
-queue sample from samples.txt
+queue sample from data/trimmed_fastq_small/samples.txt
 ```
 
 In addition to restructuring our submit file to queue a new job for each sample listed in our submit file, it is also advantageous to have our standard output, log, and error files saved to dedicated folders called "log", "output", and "error".  Therefore, we need to make these folders in our /home directory prior to submitting our job: 
@@ -238,7 +242,7 @@ cd ~
 ls
 ``` 
 
-to see our alignment results output files. We can also investigate our log, error, and output files. 
+to see our alignment results output files. We can also investigate our log, error, and output files in their respective folders. 
 
 To move all our alignment results files into a single directory, we can type
 
