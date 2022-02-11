@@ -150,16 +150,18 @@ For example, when we investigate the `bwa_test_job.log` file created in this ana
            Memory (MB)          :      144     2048      2500
 ```
 
-Here we see that we used less than half of both the disk space and memory we requested. In future jobs, we could request a smaller amount of each resource, such as 0.5 GB of disk space and 0.5 GB of memory. We should run additional test jobs using these resource requests to ensure that they will allow our job to complete successfully before scaling up our analysis. 
+Here we see that we used less than half of both the disk space and memory we requested. In future jobs, we should request a smaller amount of each resource, such as 0.5 GB of disk space and 0.5 GB of memory. Prior to scaling up our analysis, we should run additional test jobs using these resource requests to ensure that they are sufficient to allow our job to complete successfully.
 
 
 # Scaling Up to Analyze Multiple Samples
 In preparation for scaling up, please review our [guide on how to scale up after a successful test job](https://support.opensciencegrid.org/support/solutions/articles/12000076552-scaling-up-after-success-with-test-jobs) and how to 
 [easily submit multiple jobs with a single submit file](https://support.opensciencegrid.org/support/solutions/articles/12000073165-easily-submit-multiple-jobs)
 
-After reviewing how to submit multiple jobs with a single submit file, we see that an option for scaling up our analysis is to use `queue <var> from <list.txt>`. 
+After reviewing how to submit multiple jobs with a single submit file, it is possible to determine that the most appropriate way to submit multiple jobs for this analysis is to use `queue <var> from <list.txt>`. 
 
-To use this option, we first need to create a file with just the names of our samples that we want to analyze and to cut all information after the "_" symbol to remove the forward/reverse read information and file extensions. We will save the sample names in a file called `samples.txt`. 
+To use this option, we first need to create a file with just the sample names/IDs that we want to analyze. To do this, we want to cut all information after the "_" symbol to remove the forward/reverse read information and file extensions. For example, we want SRR2584863_1.trim.sub.fastq to become just SRR2584863. 
+
+We will save the sample names in a file called `samples.txt`:
 
 ```
 cd data/trimmed_fastq_small/
@@ -195,7 +197,7 @@ request_disk    = 0.5GB
 queue sample from data/trimmed_fastq_small/samples.txt
 ```
 
-In addition to restructuring our submit file to queue a new job for each sample listed in our submit file, it is also advantageous to have our standard output, log, and error files saved to dedicated folders called "log", "output", and "error" to help keep our output files organized.  Therefore, we need to make these folders in our /home directory prior to submitting our job. We will also create an additional folder to store our aligned sequencing files in a folder called `results`:
+In addition to restructuring our submit file to queue a new job for each sample, it is also advantageous to have our standard output, log, and error files saved to dedicated folders called "log", "output", and "error" to help keep our output files organized.  Therefore, we need to make these folders in our /home directory prior to submitting our job. We will also create an additional folder to store our aligned sequencing files in a folder called `results`:
 
 ```
 mkdir log
@@ -203,6 +205,7 @@ mkdir output
 mkdir error
 mkdir results
 ```
+
 To store the aligned sequencing files in the `results` folder, we can add the `transfer_output_remaps` feature to our submit file. This feature allows us to specify a name and a path to save our output files in the format of "file1 = path/to/save/file2", where file1 is the origional name of the document and file2 is the name that we want to save the file using. In the example above, we do not change the name of the resulting output files. This feature also helps us keep an organized working space, rather than having all of our resulting sequencing files be saved to our /home directory. 
 
 Once our submit file has been updated, we can update our script to look like and call it something like `bwa-alignment.sh`: 
