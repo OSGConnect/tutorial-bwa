@@ -175,15 +175,13 @@ executable      = bwa-alignment.sh
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 requirements = (OSGVO_OS_STRING == "RHEL 7")
+
 +JobDurationCategory = "Medium"
 
 transfer_input_files = software/bwa.tar.gz, data/ref_genome/ecoli_rel606.fasta.gz, data/trimmed_fastq_small/$(sample)_1.trim.sub.fastq, data/trimmed_fastq_small/$(sample)_2.trim.sub.fastq
+arguments = $(sample)
 
 transfer_output_remaps = "SRR2584863.aligned.sam=results/SRR2584863.aligned.sam; SRR2584866.aligned.sam=results/SRR2584866.aligned.sam; SRR2589044.aligned.sam=results/SRR2589044.aligned.sam"
-
-"output_small.txt=outputs/output_small.txt.$(Cluster).$(Process)"
-
-arguments = $(sample)
 
 log         = log/bwa_$(sample)_job.log
 output      = output/bwa_$(sample)_job.out
@@ -243,8 +241,7 @@ When we type `condor_q`, we see that three jobs have entered the queue (one for 
 When our jobs have completed, we can type confirm that our alignment output results files were created by typing:
 
 ```
-cd results
-ls -lah *
+ls -lh results/*
 ``` 
 
 We can also investigate our log, error, and output files in their respective folders. 
