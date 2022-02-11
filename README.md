@@ -103,7 +103,7 @@ queue 1
 ```
 You will notice that the .log, .out, and .error files will be saved to a folder called `TestJobOutput`. We need to create this folder using `mkdir TestJobOutput` before we submit our job. 
 
-We will call the script for this analysis `bwa-test.sh` and should contain the following information: 
+We will call the script for this analysis `bwa-test.sh` and it should contain the following information: 
 
 ```
 #!/bin/bash
