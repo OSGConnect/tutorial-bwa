@@ -84,6 +84,7 @@ executable  = bwa-test.sh
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 requirements = (OSGVO_OS_STRING == "RHEL 7")
+
 +JobDurationCategory = "Medium"
 
 transfer_input_files = software/bwa.tar.gz, data/ref_genome/ecoli_rel606.fasta.gz, data/trimmed_fastq_small/SRR2584863_1.trim.sub.fastq, data/trimmed_fastq_small/SRR2584863_2.trim.sub.fastq
@@ -194,7 +195,7 @@ request_disk    = 0.5GB
 queue sample from data/trimmed_fastq_small/samples.txt
 ```
 
-In addition to restructuring our submit file to queue a new job for each sample listed in our submit file, it is also advantageous to have our standard output, log, and error files saved to dedicated folders called "log", "output", and "error".  Therefore, we need to make these folders in our /home directory prior to submitting our job: 
+In addition to restructuring our submit file to queue a new job for each sample listed in our submit file, it is also advantageous to have our standard output, log, and error files saved to dedicated folders called "log", "output", and "error" to help keep our output files organized.  Therefore, we need to make these folders in our /home directory prior to submitting our job. We will also create an additional folder to store our aligned sequencing files in a folder called `results`:
 
 ```
 mkdir log
@@ -202,6 +203,7 @@ mkdir output
 mkdir error
 mkdir results
 ```
+To store the aligned sequencing files in the `results` folder, we can add the `transfer_output_remaps` feature to our submit file. This feature allows us to specify a name and a path to save our output files in the format of "name = path/to/newNameFile". This feature also helps us keep an organized working space, rather than having all of our resulting sequencing files be saved to our /home directory. 
 
 Once our submit file has been updated, we can update our script to look like and call it something like `bwa-alignment.sh`: 
 
@@ -244,10 +246,10 @@ When our jobs have completed, we can type confirm that our alignment output resu
 ls -lh results/*
 ``` 
 
-We can also investigate our log, error, and output files in their respective folders. 
+We can also investigate our log, error, and output files in their respective folders to ensure we obtained the resulting output of these files that we expected. 
 
 
 
-For more information about running bioinformatics workflows on the OSG, we recommend our [BLAST tutorial](https://support.opensciencegrid.org/support/solutions/articles/12000062020-running-a-blast-workflow) as well as our [Samtools](https://support.opensciencegrid.org/support/solutions/articles/12000074984-example-software-compilation) instillation guide. 
+_For more information about running bioinformatics workflows on the OSG, we recommend our [BLAST tutorial](https://support.opensciencegrid.org/support/solutions/articles/12000062020-running-a-blast-workflow) as well as our [Samtools](https://support.opensciencegrid.org/support/solutions/articles/12000074984-example-software-compilation) instillation guide._
 
 
