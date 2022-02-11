@@ -6,7 +6,7 @@ This tutorial focuses on a subset of the [Data Carpentry Genomics workshop curri
 
 
 # Install and Prepare BWA
-First, we need to install BWA, also called Burrows-Wheeler Aligner. To do this, we will create and navigate to a new folder in our /home directory called `software`. We will then follow the creator's instructions (https://github.com/lh3/bwa) for using `git clone` to clone the software and then build the tool using `make`. 
+First, we need to install BWA, also called Burrows-Wheeler Aligner. To do this, we will create and navigate to a new folder in our /home directory called `software`. We will then follow the developer's instructions (https://github.com/lh3/bwa) for using `git clone` to clone the software and then build the tool using `make`. 
 
 ```
 mkdir software
@@ -203,7 +203,7 @@ mkdir output
 mkdir error
 mkdir results
 ```
-To store the aligned sequencing files in the `results` folder, we can add the `transfer_output_remaps` feature to our submit file. This feature allows us to specify a name and a path to save our output files in the format of "name = path/to/newNameFile". This feature also helps us keep an organized working space, rather than having all of our resulting sequencing files be saved to our /home directory. 
+To store the aligned sequencing files in the `results` folder, we can add the `transfer_output_remaps` feature to our submit file. This feature allows us to specify a name and a path to save our output files in the format of "file1 = path/to/save/file2", where file1 is the origional name of the document and file2 is the name that we want to save the file using. In the example above, we do not change the name of the resulting output files. This feature also helps us keep an organized working space, rather than having all of our resulting sequencing files be saved to our /home directory. 
 
 Once our submit file has been updated, we can update our script to look like and call it something like `bwa-alignment.sh`: 
 
@@ -251,5 +251,3 @@ We can also investigate our log, error, and output files in their respective fol
 
 
 _For more information about running bioinformatics workflows on the OSG, we recommend our [BLAST tutorial](https://support.opensciencegrid.org/support/solutions/articles/12000062020-running-a-blast-workflow) as well as our [Samtools](https://support.opensciencegrid.org/support/solutions/articles/12000074984-example-software-compilation) instillation guide._
-
-
