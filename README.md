@@ -179,6 +179,10 @@ requirements = (OSGVO_OS_STRING == "RHEL 7")
 
 transfer_input_files = software/bwa.tar.gz, data/ref_genome/ecoli_rel606.fasta.gz, data/trimmed_fastq_small/$(sample)_1.trim.sub.fastq, data/trimmed_fastq_small/$(sample)_2.trim.sub.fastq
 
+transfer_output_remaps = "SRR2584863.aligned.sam=results/SRR2584863.aligned.sam; SRR2584866.aligned.sam=results/SRR2584866.aligned.sam; SRR2589044.aligned.sam=results/SRR2589044.aligned.sam"
+
+"output_small.txt=outputs/output_small.txt.$(Cluster).$(Process)"
+
 arguments = $(sample)
 
 log         = log/bwa_$(sample)_job.log
@@ -198,6 +202,7 @@ In addition to restructuring our submit file to queue a new job for each sample 
 mkdir log
 mkdir output
 mkdir error
+mkdir results
 ```
 
 Once our submit file has been updated, we can update our script to look like and call it something like `bwa-alignment.sh`: 
@@ -235,21 +240,16 @@ Once ready, we can submit our job to HTCondor by using `condor_submit bwa-alignm
 
 When we type `condor_q`, we see that three jobs have entered the queue (one for each of our three experimental samples).
 
-When our jobs have completed, we can type 
+When our jobs have completed, we can type confirm that our alignment output results files were created by typing:
 
 ```
-cd ~
-ls
+cd results
+ls -lah *
 ``` 
 
-to see our alignment results output files. We can also investigate our log, error, and output files in their respective folders. 
+We can also investigate our log, error, and output files in their respective folders. 
 
-To move all our alignment results files into a single directory, we can type
 
-```
-mkdir results
-mv *aligned.sam results
-```
 
 For more information about running bioinformatics workflows on the OSG, we recommend our [BLAST tutorial](https://support.opensciencegrid.org/support/solutions/articles/12000062020-running-a-blast-workflow) as well as our [Samtools](https://support.opensciencegrid.org/support/solutions/articles/12000074984-example-software-compilation) instillation guide. 
 
