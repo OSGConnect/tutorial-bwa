@@ -75,7 +75,7 @@ rm sub.tar.gz
 
 
 # Run a Single Test Job
-Now that we have all items in our analysis ready, it is time to submit a single test job to map our RNA reads to the E. coli genome. For a single test job, we will choose a single sample to analyze. In the following example, we will analyze the forward and reverse reads of both the forward and reverse reads of SRR2584863. An example submit file for this test job may be called `bwa-test.sub` and may look like: 
+Now that we have all items in our analysis ready, it is time to submit a single test job to map our RNA reads to the E. coli genome. For a single test job, we will choose a single sample to analyze. In the following example, we will align both the forward and reverse reads of SRR2584863 to the E. coli genome. Using a text editor such as `nano` or `vim`, we can create an example submit file for this test job called `bwa-test.sub` containing the following information:
 
 ```
 universe    = vanilla
