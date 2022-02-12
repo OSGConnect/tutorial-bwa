@@ -4,22 +4,30 @@
 # Introduction
 This tutorial focuses on a subset of the [Data Carpentry Genomics workshop curriculum](https://datacarpentry.org/genomics-workshop/) - specifically, this page cover's how to run a BWA workflow on OSG resources. It will use the same general flow as the BWA segment of the Data Carpentry workshop with minor adjustments. The goal of this tutorial is to learn how to convert an existing BWA workflow to run on the OS Pool.  
 
+# Make a Project Folder
+
+Logged into the submit node, make a folder for our BWA testing and analysis. Everything we do will be inside this folder: 
+
+```
+mkdir ~/bwa_example
+```
 
 # Install and Prepare BWA
 First, we need to install BWA, also called Burrows-Wheeler Aligner. To do this, we will create and navigate to a new folder in our /home directory called `software`. We will then follow the developer's instructions (https://github.com/lh3/bwa) for using `git clone` to clone the software and then build the tool using `make`. 
 
 ```
+cd ~/bwa_example
 mkdir software
 cd software
 git clone https://github.com/lh3/bwa.git
-cd bwa; make
+cd bwa
+make
 ```
 
-Next, BWA needs to be added to our PATH variables. To do so, use the following commands but replace "userID" with your own user ID. 
+Next, BWA needs to be added to our PATH variables, to test if the installation worked: 
 
 ```
-export PATH=$PATH:/home/userID/software/bwa/
-source ~/.bashrc
+export PATH=$PATH:/home/$USER/bwa_example/software/bwa/
 ``` 
 
 To check that BWA has been installed correctly, type `bwa`. You should receive output similar to the following: 
@@ -41,7 +49,7 @@ Command: index         index sequences in the FASTA format
 Now that we have successfully installed `bwa`, we will create a portable compressed tarball of this software so that it is smaller and quicker to transport when we submit our jobs to the OS Pool. 
 
 ```
-cd ~/software
+cd ~/bwa_example/software
 tar -czvf bwa.tar.gz bwa
 ```
 
@@ -52,7 +60,7 @@ Checking the size of this compressed tarball using `ls -lh bwa.tar.gz` reveals t
 Now that we have installed BWA, we need to download data to analyze. For this tutorial, we will be downloading data used in the Data Carpentry workshop. This data includes both the genome of Escherichia coli (E. coli) and paired-end RNA sequencing reads obtained from a study carried out by Zachary D. Blount, Christina Z. Borland, and Richard E. Lenski published in [PNAS](http://www.pnas.org/content/105/23/7899). Additional information about how the data was modified in preparation for this analysis can be found on the [Data Carpentry's workshop website](https://datacarpentry.org/wrangling-genomics/aio.html).
 
 ``` 
-cd ~
+cd ~/bwa_example
 mkdir -p data/ref_genome
 curl -L -o data/ref_genome/ecoli_rel606.fasta.gz ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/017/985/GCA_000017985.1_ASM1798v1/GCA_000017985.1_ASM1798v1_genomic.fna.gz
 ```
@@ -69,10 +77,14 @@ Next, we will download a small subset of quality-trimmed fastq paired-end read f
 ```
 curl -L -o sub.tar.gz https://ndownloader.figshare.com/files/14418248
 tar xvf sub.tar.gz
-mv sub/ ~/data/trimmed_fastq_small
+mv sub/ ~/bwa_example/data/trimmed_fastq_small
 rm sub.tar.gz
 ```
 
+Once everything is downloaded, make sure you're still in the `bwa_example` directory. 
+```
+cd ~/bwa_example
+```
 
 # Run a Single Test Job
 Now that we have all items in our analysis ready, it is time to submit a single test job to map our RNA reads to the E. coli genome. For a single test job, we will choose a single sample to analyze. In the following example, we will align both the forward and reverse reads of SRR2584863 to the E. coli genome. Using a text editor such as `nano` or `vim`, we can create an example submit file for this test job called `bwa-test.sub` containing the following information:
@@ -164,9 +176,9 @@ To use this option, we first need to create a file with just the sample names/ID
 We will save the sample names in a file called `samples.txt`:
 
 ```
+cd ~/bwa_example
 cd data/trimmed_fastq_small/
 ls *.fastq | cut -f 1 -d '_' | uniq > samples.txt
-cd ~
 ```
 
 Now, we can create a new submit file called `bwa-alignment.sub` to queue a new job for each sample. 
