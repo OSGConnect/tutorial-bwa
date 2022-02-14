@@ -167,7 +167,7 @@ Here we see that we used less than half of both the disk space and memory we req
 
 # Scaling Up to Analyze Multiple Samples
 In preparation for scaling up, please review our [guide on how to scale up after a successful test job](https://support.opensciencegrid.org/support/solutions/articles/12000076552-scaling-up-after-success-with-test-jobs) and how to 
-[easily submit multiple jobs with a single submit file](https://support.opensciencegrid.org/support/solutions/articles/12000073165-easily-submit-multiple-jobs)
+[easily submit multiple jobs with a single submit file](https://support.opensciencegrid.org/support/solutions/articles/12000073165-easily-submit-multiple-jobs).
 
 After reviewing how to submit multiple jobs with a single submit file, it is possible to determine that the most appropriate way to submit multiple jobs for this analysis is to use `queue <var> from <list.txt>`. 
 
@@ -179,6 +179,7 @@ We will save the sample names in a file called `samples.txt`:
 cd ~/bwa_example
 cd data/trimmed_fastq_small/
 ls *.fastq | cut -f 1 -d '_' | uniq > samples.txt
+cd ~/bwa_example
 ```
 
 Now, we can create a new submit file called `bwa-alignment.sub` to queue a new job for each sample. 
