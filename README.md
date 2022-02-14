@@ -2,7 +2,7 @@
 
 
 # Introduction
-This tutorial focuses on a subset of the [Data Carpentry Genomics workshop curriculum](https://datacarpentry.org/genomics-workshop/) - specifically, this page cover's how to run a BWA workflow on OSG resources. It will use the same general flow as the BWA segment of the Data Carpentry workshop with minor adjustments. The goal of this tutorial is to learn how to convert an existing BWA workflow to run on the OS Pool.  
+This tutorial focuses on a subset of the [Data Carpentry Genomics workshop curriculum](https://datacarpentry.org/genomics-workshop/) - specifically, this page cover's how to run a BWA workflow on OSG resources. It will use the same general flow as the BWA segment of the Data Carpentry workshop with minor adjustments. The goal of this tutorial is to learn how to convert an existing BWA workflow to run on the OSPool.  
 
 # Make a Project Folder
 
@@ -46,18 +46,18 @@ Command: index         index sequences in the FASTA format
 
 ```
 
-Now that we have successfully installed `bwa`, we will create a portable compressed tarball of this software so that it is smaller and quicker to transport when we submit our jobs to the OS Pool. 
+Now that we have successfully installed `bwa`, we will create a portable compressed tarball of this software so that it is smaller and quicker to transport when we submit our jobs to the OSPool. 
 
 ```
 cd ~/bwa_example/software
 tar -czvf bwa.tar.gz bwa
 ```
 
-Checking the size of this compressed tarball using `ls -lh bwa.tar.gz` reveals the file is approximately 4MB, which means it should stay in /home. 
+Checking the size of this compressed tarball using `ls -lh bwa.tar.gz` reveals the file is approximately 4MB. The tarball should stay in /home.
 
 
 # Download Data to Analyze
-Now that we have installed BWA, we need to download data to analyze. For this tutorial, we will be downloading data used in the Data Carpentry workshop. This data includes both the genome of Escherichia coli (E. coli) and paired-end RNA sequencing reads obtained from a study carried out by Zachary D. Blount, Christina Z. Borland, and Richard E. Lenski published in [PNAS](http://www.pnas.org/content/105/23/7899). Additional information about how the data was modified in preparation for this analysis can be found on the [Data Carpentry's workshop website](https://datacarpentry.org/wrangling-genomics/aio.html).
+Now that we have installed BWA, we need to download data to analyze. For this tutorial, we will be downloading data used in the Data Carpentry workshop. This data includes both the genome of Escherichia coli (E. coli) and paired-end RNA sequencing reads obtained from a study carried out by Blount et al. published in [PNAS](http://www.pnas.org/content/105/23/7899). Additional information about how the data was modified in preparation for this analysis can be found on the [Data Carpentry's workshop website](https://datacarpentry.org/wrangling-genomics/aio.html).
 
 ``` 
 cd ~/bwa_example
@@ -255,7 +255,7 @@ Once ready, we can submit our job to HTCondor by using `condor_submit bwa-alignm
 
 When we type `condor_q`, we see that three jobs have entered the queue (one for each of our three experimental samples).
 
-When our jobs have completed, we can type confirm that our alignment output results files were created by typing:
+When our jobs are completed, we can confirm that our alignment output results files were created by typing:
 
 ```
 ls -lh results/*
