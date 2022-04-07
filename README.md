@@ -189,7 +189,7 @@ arguments   = $(sample)
 
 transfer_input_files = software/bwa.tar.gz, data/ref_genome/ecoli_rel606.fasta.gz, data/trimmed_fastq_small/$(sample)_1.trim.sub.fastq, data/trimmed_fastq_small/$(sample)_2.trim.sub.fastq
 
-transfer_output_remaps = "SRR2584863.aligned.sam=results/SRR2584863.aligned.sam; SRR2584866.aligned.sam=results/SRR2584866.aligned.sam; SRR2589044.aligned.sam=results/SRR2589044.aligned.sam"
+transfer_output_remaps = "$(sample).aligned.sam=results/$(sample).aligned.sam"
 
 log         = log/bwa_$(sample)_job.log
 output      = output/bwa_$(sample)_job.out
