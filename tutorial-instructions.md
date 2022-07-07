@@ -66,7 +66,9 @@ cd ~/tutorial-bwa
 ./download_data.sh
 ```
 
-Investigating the size of the downloaded genome by typing:
+The `./download_data.sh` script will create two new folders inside the `/data` directory called `/ref_genome` and `/trimmed_fastq_small`. This script will download our E. coli genome file into the `/ref_genome` directory and will download short paired-end RNA sequencing files into the `/trimmed_fastq_small` directory. 
+
+Once this executable finishes running, which may take several minutes, we can investigate the size of the downloaded genome file by typing:
 
 ```
 ls -lh data/ref_genome/
@@ -78,6 +80,8 @@ reveals the file is 1.4 MB. Therefore, this file should remain in `/home` and do
 ls -lh data/trimmed_fastq_small
 ```
 
+We see that these files are all approximately 50 MB, which means they should remain in our `/home` directory.  
+
 Once everything is downloaded, make sure you're still in the `tutorial-bwa` directory. 
 
 ```
@@ -86,16 +90,16 @@ cd ~/tutorial-bwa
 
 ## Run a Single Test Job
 
-Now that we have all items in our analysis ready, it is time to submit a single test job to map our RNA reads to the E. coli genome. For a single test job, we will choose a single sample to analyze. In the following example, we will align both the forward and reverse reads of SRR2584863 to the E. coli genome. Using a text editor such as `nano` or `vim`, we can create an example submit file for this test job called `bwa-test.sub` containing the following information:
+Now that we have all items in our analysis ready, it is time to submit a single test job to map our RNA reads to the E. coli genome. For a single test job, we will choose a single sample to analyze. In the following example, we will align both the forward and reverse reads of SRR2584863 to the E. coli genome. Using a text editor such as `nano` or `vim`, we will open our example submit file for this test job called `bwa-test.sub`, which contains the following information:
 
 ```
 universe    = vanilla
-executable  = bwa-test.sh
+executable  = 
 # arguments = 
 
 # need to transfer bwa.tar.gz file, the reference
 # genome, and the trimmed fastq files
-transfer_input_files = software/bwa.tar.gz, data/ref_genome/ecoli_rel606.fasta.gz, data/trimmed_fastq_small/SRR2584863_1.trim.sub.fastq, data/trimmed_fastq_small/SRR2584863_2.trim.sub.fastq
+transfer_input_files = 
 
 log         = TestJobOutput/bwa_test_job.log
 output      = TestJobOutput/bwa_test_job.out
@@ -113,9 +117,45 @@ requirements = (OSGVO_OS_STRING == "RHEL 7")
 queue 1
 ```
 
-You will notice that the `.log`, `.out`, and `.error` files will be saved to a folder called `TestJobOutput`. We need to create this folder using `mkdir TestJobOutput` before we submit our job. 
+Let's fill in exeutable for this job so that HTCondor knows what to run: 
 
-We will call the script for this analysis `bwa-test.sh` and it should contain the following information: 
+```
+executable = bwa-test.sh
+```
+
+Next, let's edit the `transfer_input_files` line so that HTCondor knows which files to transfer to the job:
+
+```
+transfer_input_files = software/bwa.tar.gz, data/ref_genome/ecoli_rel606.fasta.gz, data/trimmed_fastq_small/SRR2584863_1.trim.sub.fastq, data/trimmed_fastq_small/SRR2584863_2.trim.sub.fastq
+```
+
+You will notice that the `.log`, `.out`, and `.error` files will be saved to a folder called `TestJobOutput`. We need to save our changes to the submit file, exit our text editor, and create this folder using `mkdir TestJobOutput` before we submit our job. 
+
+Once we have prepared our submit file, we will prepare our `bwa-test.sh`. Currently, our executable looks like: 
+
+```
+#!/bin/bash
+# Script name: bwa-test.sh
+
+echo "Unpacking software"
+
+echo "Setting PATH for bwa" 
+
+echo "Indexing E. coli genome"
+
+echo "Starting bwa alignment for SRR2584863"
+
+echo "Done with bwa alignment for SRR2584863!"
+
+echo "Cleaning up files generated from genome indexing"
+rm ecoli_rel606.fasta.gz.amb
+rm ecoli_rel606.fasta.gz.ann
+rm ecoli_rel606.fasta.gz.bwt
+rm ecoli_rel606.fasta.gz.pac
+rm ecoli_rel606.fasta.gz.sa
+```
+
+We need to edit it to contain the command to unpack our BWA software (`tar -xzf bwa.tar.gz`) and to set the PATH to the bwa executable (`export PATH=$_CONDOR_SCRATCH_DIR/bwa/:$PATH`), which is a modified version of our earlier command to set the PATH variable. Lastly, we need to add example commands for BWA to analyze our paired-end RNA sequencing files. An example executable may look like: 
 
 ```
 #!/bin/bash
@@ -143,7 +183,7 @@ rm ecoli_rel606.fasta.gz.pac
 rm ecoli_rel606.fasta.gz.sa
 ```
 
-We can submit this single test job to HTCondor by typing: 
+Once done, we can submit this single test job to HTCondor by typing: 
 
 ```
 condor_submit bwa-test.sub
@@ -174,22 +214,36 @@ In preparation for scaling up, please review our [guide on how to scale up after
 
 After reviewing how to submit multiple jobs with a single submit file, we see that the most appropriate way to submit multiple jobs for this analysis is to use `queue <var> from <list.txt>` because we want HTCondor to queue an independent job to analyze each of our biological samples. 
 
-To use this option, we first need to create a file with just the sample names/IDs that we want to analyze. To do this, we want to cut all information after the "_" symbol to remove the forward/reverse read information and file extensions. For example, we want SRR2584863_1.trim.sub.fastq to become just SRR2584863. 
+To use this option, we first need to create a file with just the sample names/IDs that we want to analyze. To do this, we want to cut all information after the "_" symbol to remove the forward/reverse read information and file extensions. For example, we want SRR2584863_1.trim.sub.fastq to become just SRR2584863. Note, this step is just an example of one way to prepare your workflow to automatically queue multiple jobs - there are several other approaches that could have alternatively been used. 
 
-We will save the sample names in a file called `samples.txt`:
+We will save the sample names in a file called `samples.txt` and view the contents of this file using `cat samples.txt`:
 
 ```
 cd ~/tutorial-bwa
 cd data/trimmed_fastq_small/
 ls *.fastq | cut -f 1 -d '_' | uniq > samples.txt
+cat samples.txt
 cd ~/tutorial-bwa
 ```
 
-Now, we can create a new submit file called `bwa-alignment.sub` to queue a new job for each sample. To make it simpler to start, you can copy the `bwa-test.sub` file (`cp bwa-test.sub bwa-alignment.sub`) and modify it. 
+Now, we can create a new submit file called `many-bwa-alignment.sub` to queue a new job for each sample. To make it simpler to start, you can copy the `bwa-test.sub` file (`cp bwa-test.sub many-bwa-alignment.sub`) and modify it. By editing the `queue` statement to be something like `queue sample from data/trimmed_fastq_small/samples.txt`, we can then call the `sample` variable elsewhere in our submit file by using `$(sample). 
+
+In addition to restructuring our submit file to queue a new job for each sample, it is also advantageous to have our standard output, log, and error files saved to dedicated folders called "log", "output", and "error" to help keep our many output files organized.  Therefore, we need to make these folders in our `/home` directory prior to submitting our job. We will also create an additional folder called `results` to store our aligned sequencing file output:
+
+```
+mkdir log
+mkdir output
+mkdir error
+mkdir results
+```
+
+To store the aligned sequencing files in the `results` folder, we can add the `transfer_output_remaps` feature to our submit file. This feature allows us to specify a name and a path to save our output files in the format of `transfer_output_remaps = "file1 = path/to/save/file2"`, where file1 is the origional name of the document and file2 is the name that we want to save the file using. In the example above, we do not change the name of the resulting output files. `Transfer_output_remaps` also helps us keep an organized working space by having our analysis output files saved to a `/results` folder within `/home`, rather than having all of our resulting sequencing files be saved to our main `/home` directory. 
+
+An example submit file containing these changes, along with our decreased memory and disk space requests, is: 
 
 ```
 universe    = vanilla
-executable  = bwa-alignment.sh
+executable  = many-bwa-alignment.sh
 arguments   = $(sample)
 
 transfer_input_files = software/bwa.tar.gz, data/ref_genome/ecoli_rel606.fasta.gz, data/trimmed_fastq_small/$(sample)_1.trim.sub.fastq, data/trimmed_fastq_small/$(sample)_2.trim.sub.fastq
@@ -212,22 +266,11 @@ requirements = (OSGVO_OS_STRING == "RHEL 7")
 queue sample from data/trimmed_fastq_small/samples.txt
 ```
 
-In addition to restructuring our submit file to queue a new job for each sample, it is also advantageous to have our standard output, log, and error files saved to dedicated folders called "log", "output", and "error" to help keep our output files organized.  Therefore, we need to make these folders in our `/home` directory prior to submitting our job. We will also create an additional folder called `results` to store our aligned sequencing file output:
-
-```
-mkdir log
-mkdir output
-mkdir error
-mkdir results
-```
-
-To store the aligned sequencing files in the `results` folder, we can add the `transfer_output_remaps` feature to our submit file. This feature allows us to specify a name and a path to save our output files in the format of `transfer_output_remaps = "file1 = path/to/save/file2"`, where file1 is the origional name of the document and file2 is the name that we want to save the file using. In the example above, we do not change the name of the resulting output files. `Transfer_output_remaps` also helps us keep an organized working space by having our analysis output files saved to a `/results` folder within `/home` , rather than having all of our resulting sequencing files be saved to our main `/home` directory. 
-
-Once our submit file has been updated, we can update our script to look like and call it something like `bwa-alignment.sh`: 
+Once our submit file has been updated, we also want to make sure to update our executable such that when we queue a job for each sample, our script will know how to analyze the different input sequencing files. Let's copy our `bwa-test.sh` file and create a new executable called `many-bwa-alignment.sh` by typing `cp bwa-test.sh many-bwa-alignment.sh` and edit the file to look like: 
 
 ```
 #!/bin/bash
-# Script name: bwa-alignment.sh
+# Script name: many-bwa-alignment.sh
 
 echo "Unpackage software"
 tar -xzf bwa.tar.gz
@@ -254,7 +297,7 @@ rm ecoli_rel606.fasta.gz.pac
 rm ecoli_rel606.fasta.gz.sa
 ```
 
-Once ready, we can submit our job to HTCondor by using `condor_submit bwa-alignment.sub`. 
+Once ready, we can submit our job to HTCondor by using `condor_submit many-bwa-alignment.sub`. 
 
 When we type `condor_q`, we see that three jobs have entered the queue (one for each of our three experimental samples).
 
@@ -263,6 +306,8 @@ When our jobs are completed, we can confirm that our alignment output results fi
 ```
 ls -lh results/*
 ``` 
+
+We should see our bwa results files (SRR2584863.aligned.sam,	SRR2584866.aligned.sam,	SRR2589044.aligned.sam). 
 
 We can also investigate our log, error, and output files in their respective folders to ensure we obtained the resulting output of these files that we expected. 
 
