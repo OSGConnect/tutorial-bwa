@@ -15,7 +15,7 @@ tutorial bwa
 ```
 
 ## Install and Prepare BWA
-First, we need to install BWA, also called Burrows-Wheeler Aligner. To do this, we will create and navigate to a new folder in our /home directory called `software`. We will then follow the developer's instructions (https://github.com/lh3/bwa) for using `git clone` to clone the software and then build the tool using `make`. 
+First, we need to install BWA, also called Burrows-Wheeler Aligner. To do this, we will create and navigate to a new folder in our `/home` directory called `software`. We will then follow the developer's instructions (https://github.com/lh3/bwa) for using `git clone` to clone the software and then build the tool using `make`. 
 
 ```
 cd ~/tutorial-bwa
@@ -54,7 +54,7 @@ cd ~/tutorial-bwa/software
 tar -czvf bwa.tar.gz bwa
 ```
 
-Checking the size of this compressed tarball using `ls -lh bwa.tar.gz` reveals the file is approximately 4MB. The tarball should stay in /home.
+Checking the size of this compressed tarball using `ls -lh bwa.tar.gz` reveals the file is approximately 4MB. Based off of the [Overview: Data Staging and Transfer to Jobs](https://support.opensciencegrid.org/support/solutions/articles/12000002985-overview-data-staging-and-transfer-to-jobs) guide, this size of this tarball should stay in `/home`.
 
 
 ## Download Data to Analyze
@@ -65,19 +65,21 @@ Now that we have installed BWA, we need to download data to analyze. For this tu
 cd ~/tutorial-bwa
 ./download_data.sh
 ```
+
 Investigating the size of the downloaded genome by typing:
 
 ```
 ls -lh data/ref_genome/
 ```
 
-reveals the file is 1.4 MB. Therefore, this file should remain in /home and does not need to be moved to /public. We should also check the trimmed fastq paired-end read files: 
+reveals the file is 1.4 MB. Therefore, this file should remain in `/home` and does not need to be moved to `/public`. We should also check the trimmed fastq paired-end read files: 
 
 ```
 ls -lh data/trimmed_fastq_small
 ```
 
 Once everything is downloaded, make sure you're still in the `tutorial-bwa` directory. 
+
 ```
 cd ~/tutorial-bwa
 ```
@@ -110,7 +112,8 @@ requirements = (OSGVO_OS_STRING == "RHEL 7")
 
 queue 1
 ```
-You will notice that the .log, .out, and .error files will be saved to a folder called `TestJobOutput`. We need to create this folder using `mkdir TestJobOutput` before we submit our job. 
+
+You will notice that the `.log`, `.out`, and `.error` files will be saved to a folder called `TestJobOutput`. We need to create this folder using `mkdir TestJobOutput` before we submit our job. 
 
 We will call the script for this analysis `bwa-test.sh` and it should contain the following information: 
 
@@ -148,6 +151,8 @@ condor_submit bwa-test.sub
 
 To check the status of the job, we can use `condor_q`. 
 
+# Optimize Resource Requests
+
 Upon the completion of the test job, we should investigate the output to ensure that it is what we expected and also review the `.log` file to help optimize future resource requests in preparation for scaling up. 
 
 For example, when we investigate the `bwa_test_job.log` file created in this analysis, at the bottom of the file we see a resource table: 
@@ -167,7 +172,7 @@ Here we see that we used less than half of both the disk space and memory we req
 In preparation for scaling up, please review our [guide on how to scale up after a successful test job](https://support.opensciencegrid.org/support/solutions/articles/12000076552-scaling-up-after-success-with-test-jobs) and how to 
 [easily submit multiple jobs with a single submit file](https://support.opensciencegrid.org/support/solutions/articles/12000073165-easily-submit-multiple-jobs).
 
-After reviewing how to submit multiple jobs with a single submit file, it is possible to determine that the most appropriate way to submit multiple jobs for this analysis is to use `queue <var> from <list.txt>`. 
+After reviewing how to submit multiple jobs with a single submit file, we see that the most appropriate way to submit multiple jobs for this analysis is to use `queue <var> from <list.txt>` because we want HTCondor to queue an independent job to analyze each of our biological samples. 
 
 To use this option, we first need to create a file with just the sample names/IDs that we want to analyze. To do this, we want to cut all information after the "_" symbol to remove the forward/reverse read information and file extensions. For example, we want SRR2584863_1.trim.sub.fastq to become just SRR2584863. 
 
@@ -207,7 +212,7 @@ requirements = (OSGVO_OS_STRING == "RHEL 7")
 queue sample from data/trimmed_fastq_small/samples.txt
 ```
 
-In addition to restructuring our submit file to queue a new job for each sample, it is also advantageous to have our standard output, log, and error files saved to dedicated folders called "log", "output", and "error" to help keep our output files organized.  Therefore, we need to make these folders in our /home directory prior to submitting our job. We will also create an additional folder to store our aligned sequencing files in a folder called `results`:
+In addition to restructuring our submit file to queue a new job for each sample, it is also advantageous to have our standard output, log, and error files saved to dedicated folders called "log", "output", and "error" to help keep our output files organized.  Therefore, we need to make these folders in our `/home` directory prior to submitting our job. We will also create an additional folder called `results` to store our aligned sequencing file output:
 
 ```
 mkdir log
@@ -216,7 +221,7 @@ mkdir error
 mkdir results
 ```
 
-To store the aligned sequencing files in the `results` folder, we can add the `transfer_output_remaps` feature to our submit file. This feature allows us to specify a name and a path to save our output files in the format of "file1 = path/to/save/file2", where file1 is the origional name of the document and file2 is the name that we want to save the file using. In the example above, we do not change the name of the resulting output files. This feature also helps us keep an organized working space, rather than having all of our resulting sequencing files be saved to our /home directory. 
+To store the aligned sequencing files in the `results` folder, we can add the `transfer_output_remaps` feature to our submit file. This feature allows us to specify a name and a path to save our output files in the format of `transfer_output_remaps = "file1 = path/to/save/file2"`, where file1 is the origional name of the document and file2 is the name that we want to save the file using. In the example above, we do not change the name of the resulting output files. `Transfer_output_remaps` also helps us keep an organized working space by having our analysis output files saved to a `/results` folder within `/home` , rather than having all of our resulting sequencing files be saved to our main `/home` directory. 
 
 Once our submit file has been updated, we can update our script to look like and call it something like `bwa-alignment.sh`: 
 
