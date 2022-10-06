@@ -1,7 +1,9 @@
-[TOC]
+---
+ospool:
+    path: software_examples/bioinformatics/tutorial-bwa/README.md
+---
 
-
-## Introduction
+# High-Throughput BWA Read Mapping
 
 This tutorial focuses on a subset of the [Data Carpentry Genomics workshop curriculum](https://datacarpentry.org/genomics-workshop/) - specifically, this page cover's how to run a BWA workflow on OSG resources. It will use the same general flow as the BWA segment of the Data Carpentry workshop with minor adjustments. The goal of this tutorial is to learn how to convert an existing BWA workflow to run on the OSPool.  
 
