@@ -96,23 +96,23 @@ executable  = bwa-test.sh
 # need to transfer bwa.tar.gz file, the reference
 # genome, and the trimmed fastq files
 transfer_input_files = software/bwa.tar.gz, data/ref_genome/ecoli_rel606.fasta.gz, data/trimmed_fastq_small/SRR2584863_1.trim.sub.fastq, data/trimmed_fastq_small/SRR2584863_2.trim.sub.fastq
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
 
-log         = TestJobOutput/bwa_test_job.log
-output      = TestJobOutput/bwa_test_job.out
-error       = TestJobOutput/bwa_test_job.error
+log         = logs/bwa_test_job.log
+output      = logs/bwa_test_job.out
+error       = logs/bwa_test_job.error
 
 +JobDurationCategory = "Medium"
 request_cpus    = 1
 request_memory  = 2GB
 request_disk    = 1GB
 
-should_transfer_files = YES
-when_to_transfer_output = ON_EXIT
 requirements = (OSGVO_OS_STRING == "RHEL 7")
 
 queue 1
 ```
-You will notice that the .log, .out, and .error files will be saved to a folder called `TestJobOutput`. We need to create this folder using `mkdir TestJobOutput` before we submit our job. 
+You will notice that the .log, .out, and .error files will be saved to a folder called `logs`. We need to create this folder using `mkdir logs` before we submit our job. 
 
 We will call the script for this analysis `bwa-test.sh` and it should contain the following information: 
 
@@ -190,31 +190,27 @@ executable  = bwa-alignment.sh
 arguments   = $(sample)
 
 transfer_input_files = software/bwa.tar.gz, data/ref_genome/ecoli_rel606.fasta.gz, data/trimmed_fastq_small/$(sample)_1.trim.sub.fastq, data/trimmed_fastq_small/$(sample)_2.trim.sub.fastq
-
 transfer_output_remaps = "$(sample).aligned.sam=results/$(sample).aligned.sam"
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
 
-log         = log/bwa_$(sample)_job.log
-output      = output/bwa_$(sample)_job.out
-error       = error/bwa_$(sample)_job.error
+log         = logs/bwa_$(sample)_job.log
+output      = logs/bwa_$(sample)_job.out
+error       = logs/bwa_$(sample)_job.error
 
 +JobDurationCategory = "Medium"
 request_cpus    = 1 
 request_memory  = 0.5GB
 request_disk    = 0.5GB
 
-should_transfer_files = YES
-when_to_transfer_output = ON_EXIT
 requirements = (OSGVO_OS_STRING == "RHEL 7")
 
 queue sample from data/trimmed_fastq_small/samples.txt
 ```
 
-In addition to restructuring our submit file to queue a new job for each sample, it is also advantageous to have our standard output, log, and error files saved to dedicated folders called "log", "output", and "error" to help keep our output files organized.  Therefore, we need to make these folders in our /home directory prior to submitting our job. We will also create an additional folder to store our aligned sequencing files in a folder called `results`:
+We will need to create an additional folder to store our aligned sequencing files in a folder called `results`:
 
 ```
-mkdir log
-mkdir output
-mkdir error
 mkdir results
 ```
 
@@ -233,15 +229,15 @@ echo "Set PATH for bwa"
 export PATH=$_CONDOR_SCRATCH_DIR/bwa/:$PATH
 
 # Renaming first argument
-sample=$1
+SAMPLE=$1
 
 echo "Index E.coli genome"
 bwa index ecoli_rel606.fasta.gz
 
-echo "Starting bwa alignment for ${sample}"
-bwa mem ecoli_rel606.fasta.gz ${sample}_1.trim.sub.fastq ${sample}_2.trim.sub.fastq > ${sample}.aligned.sam
+echo "Starting bwa alignment for ${SAMPLE}"
+bwa mem ecoli_rel606.fasta.gz ${SAMPLE}_1.trim.sub.fastq ${SAMPLE}_2.trim.sub.fastq > ${sample}.aligned.sam
 
-echo "Done with bwa alignment for ${sample}!"
+echo "Done with bwa alignment for ${SAMPLE}!"
 
 echo "Cleaning up workspace"
 rm ecoli_rel606.fasta.gz.amb
@@ -261,7 +257,7 @@ When our jobs are completed, we can confirm that our alignment output results fi
 ls -lh results/*
 ``` 
 
-We can also investigate our log, error, and output files in their respective folders to ensure we obtained the resulting output of these files that we expected. 
+We can also investigate our log, error, and output files in the `logs` folder to ensure we obtained the resulting output of these files that we expected. 
 
 
 

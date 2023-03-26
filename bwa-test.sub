@@ -5,18 +5,18 @@ executable  =
 # need to transfer bwa.tar.gz file, the reference
 # genome, and the trimmed fastq files
 transfer_input_files = 
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
 
-log         = TestJobOutput/bwa_test_job.log
-output      = TestJobOutput/bwa_test_job.out
-error       = TestJobOutput/bwa_test_job.error
+log         = logs/bwa_test_job.log
+output      = logs/bwa_test_job.out
+error       = logs/bwa_test_job.error
 
 +JobDurationCategory = "Medium"
 request_cpus    = 1
 request_memory  = 2GB
 request_disk    = 1GB
 
-should_transfer_files = YES
-when_to_transfer_output = ON_EXIT
 requirements = (OSGVO_OS_STRING == "RHEL 7")
 
 queue 1
