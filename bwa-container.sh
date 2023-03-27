@@ -1,6 +1,9 @@
 #!/bin/bash
 # Script name: bwa-container.sh
 
+# Setting BWA location
+export PATH=/bwa:$PATH
+
 echo "Indexing E. coli genome"
 bwa index ecoli_rel606.fasta.gz
 
