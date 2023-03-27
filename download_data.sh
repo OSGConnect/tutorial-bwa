@@ -5,3 +5,4 @@ curl -L -o sub.tar.gz https://ndownloader.figshare.com/files/14418248
 tar xvf sub.tar.gz
 mv sub/ data/trimmed_fastq_small
 rm sub.tar.gz
+curl -L -o software/bwa.sif http://stash.osgconnect.net/public/osg/NIAID-2023/bwa.sif
