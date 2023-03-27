@@ -1,5 +1,5 @@
 universe    = container
-container_image = software/bwa.sif
+container_image = 
 
 executable  = 
 # arguments = 
@@ -16,7 +16,7 @@ error       = logs/bwa_test_job.error
 
 +JobDurationCategory = "Medium"
 request_cpus    = 1
-request_memory  = 500MB
-request_disk    = 500MB
+request_memory  = 1GB
+request_disk    = 1GB
 
 queue 1
