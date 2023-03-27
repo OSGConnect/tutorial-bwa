@@ -1,0 +1,22 @@
+universe    = container
+container_image = software/bwa.sif
+
+executable  = 
+# arguments = 
+
+# need to transfer bwa.tar.gz file, the reference
+# genome, and the trimmed fastq files
+transfer_input_files = 
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+
+log         = logs/bwa_test_job.log
+output      = logs/bwa_test_job.out
+error       = logs/bwa_test_job.error
+
++JobDurationCategory = "Medium"
+request_cpus    = 1
+request_memory  = 500MB
+request_disk    = 500MB
+
+queue 1
