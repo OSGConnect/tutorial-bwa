@@ -2,10 +2,10 @@
 # Script name: bwa-container.sh
 
 echo "Indexing E. coli genome"
-bwa index 
+bwa index ecoli_rel606.fasta.gz
 
 echo "Starting bwa alignment for SRR2584863"
-bwa mem 
+bwa mem ecoli_rel606.fasta.gz SRR2584863_1.trim.sub.fastq SRR2584863_2.trim.sub.fastq > SRR2584863.aligned.sam
 
 echo "Done with bwa alignment for SRR2584863!"
 
