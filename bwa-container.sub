@@ -1,4 +1,6 @@
-universe    = vanilla
+universe    = container
+container_image = software/bwa.sif
+
 executable  = 
 # arguments = 
 
@@ -14,9 +16,7 @@ error       = logs/bwa_test_job.error
 
 +JobDurationCategory = "Medium"
 request_cpus    = 1
-request_memory  = 2GB
-request_disk    = 1GB
-
-requirements = (OSGVO_OS_STRING == "RHEL 7")
+request_memory  = 500MB
+request_disk    = 500MB
 
 queue 1
