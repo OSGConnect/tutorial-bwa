@@ -9,15 +9,15 @@ This tutorial focuses on a subset of the [Data Carpentry Genomics workshop curri
 
 ## Get Tutorial Files
 
-Logged into the submit node, we will run the tutorial command, that will 
+Logged into the submit node, we will download the tutorial materials. This will
 create a folder for our analysis, as well as some sample files. 
 
 ```
-tutorial bwa
+git clone https://github.com/OSGConnect/tutorial-bwa
 ```
 
 ## Install and Prepare BWA
-First, we need to install BWA, also called Burrows-Wheeler Aligner. To do this, we will create and navigate to a new folder in our /home directory called `software`. We will then follow the developer's instructions (https://github.com/lh3/bwa) for using `git clone` to clone the software and then build the tool using `make`. 
+First, we need to install BWA, also called Burrows-Wheeler Aligner. To do this, we will create and navigate to a new folder in our `/home` directory called `software`. We will then follow the developer's instructions (https://github.com/lh3/bwa) for using `git clone` to clone the software and then build the tool using `make`. 
 
 ```
 cd ~/tutorial-bwa
@@ -56,7 +56,7 @@ cd ~/tutorial-bwa/software
 tar -czvf bwa.tar.gz bwa
 ```
 
-Checking the size of this compressed tarball using `ls -lh bwa.tar.gz` reveals the file is approximately 4MB. The tarball should stay in /home.
+Checking the size of this compressed tarball using `ls -lh bwa.tar.gz` reveals the file is approximately 4MB. The tarball should stay in `/home`.
 
 
 ## Download Data to Analyze
@@ -80,6 +80,7 @@ ls -lh data/trimmed_fastq_small
 ```
 
 Once everything is downloaded, make sure you're still in the `tutorial-bwa` directory. 
+
 ```
 cd ~/tutorial-bwa
 ```
