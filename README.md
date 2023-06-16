@@ -235,7 +235,7 @@ echo "Index E.coli genome"
 bwa index ecoli_rel606.fasta.gz
 
 echo "Starting bwa alignment for ${SAMPLE}"
-bwa mem ecoli_rel606.fasta.gz ${SAMPLE}_1.trim.sub.fastq ${SAMPLE}_2.trim.sub.fastq > ${sample}.aligned.sam
+bwa mem ecoli_rel606.fasta.gz ${SAMPLE}_1.trim.sub.fastq ${SAMPLE}_2.trim.sub.fastq > ${SAMPLE}.aligned.sam
 
 echo "Done with bwa alignment for ${SAMPLE}!"
 
