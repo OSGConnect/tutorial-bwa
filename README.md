@@ -9,15 +9,15 @@ This tutorial focuses on a subset of the [Data Carpentry Genomics workshop curri
 
 ## Get Tutorial Files
 
-Logged into the submit node, we will run the tutorial command, that will 
+Logged into our access point, we will run the the following command, that will 
 create a folder for our analysis, as well as some sample files. 
 
 ```
-tutorial bwa
+wget https://github.com/OSGConnect/tutorial-bwa/edit/main/README.md
 ```
 
 ## Install and Prepare BWA
-First, we need to install BWA, also called Burrows-Wheeler Aligner. To do this, we will create and navigate to a new folder in our /home directory called `software`. We will then follow the developer's instructions (https://github.com/lh3/bwa) for using `git clone` to clone the software and then build the tool using `make`. 
+First, we need to install BWA, also called Burrows-Wheeler Aligner. To do this, we will create and navigate to a new folder in our `/home` directory called `software`. We will then follow the developer's instructions (https://github.com/lh3/bwa) for using `git clone` to clone the software and then build the tool using `make`. 
 
 ```
 cd ~/tutorial-bwa
@@ -27,7 +27,7 @@ cd bwa
 make
 ```
 
-Next, BWA needs to be added to our PATH variables, to test if the installation worked: 
+Next, BWA needs to be added to our PATH variables so that the system knows where to find our software and to test if the installation worked: 
 
 ```
 export PATH=$PATH:/home/$USER/tutorial-bwa/software/bwa/
@@ -56,7 +56,7 @@ cd ~/tutorial-bwa/software
 tar -czvf bwa.tar.gz bwa
 ```
 
-Checking the size of this compressed tarball using `ls -lh bwa.tar.gz` reveals the file is approximately 4MB. The tarball should stay in /home.
+Checking the size of this compressed tarball using `ls -lh bwa.tar.gz` reveals the file is approximately 4MB. The tarball should stay in `/home`.
 
 
 ## Download Data to Analyze
@@ -73,7 +73,7 @@ Investigating the size of the downloaded genome by typing:
 ls -lh data/ref_genome/
 ```
 
-reveals the file is 1.4 MB. Therefore, this file should remain in /home and does not need to be moved to /public. We should also check the trimmed fastq paired-end read files: 
+reveals the file is 1.4 MB. Therefore, this file should remain in `/home` and does not need to be moved to `/public`. We should also check the trimmed fastq paired-end read files: 
 
 ```
 ls -lh data/trimmed_fastq_small
@@ -89,29 +89,32 @@ cd ~/tutorial-bwa
 Now that we have all items in our analysis ready, it is time to submit a single test job to map our RNA reads to the E. coli genome. For a single test job, we will choose a single sample to analyze. In the following example, we will align both the forward and reverse reads of SRR2584863 to the E. coli genome. Using a text editor such as `nano` or `vim`, we can create an example submit file for this test job called `bwa-test.sub` containing the following information:
 
 ```
-universe    = vanilla
+# File Name: bwa-test.sub
 executable  = bwa-test.sh
 # arguments = 
 
 # need to transfer bwa.tar.gz file, the reference
 # genome, and the trimmed fastq files
 transfer_input_files = software/bwa.tar.gz, data/ref_genome/ecoli_rel606.fasta.gz, data/trimmed_fastq_small/SRR2584863_1.trim.sub.fastq, data/trimmed_fastq_small/SRR2584863_2.trim.sub.fastq
-should_transfer_files = YES
-when_to_transfer_output = ON_EXIT
 
+# List the locations and names we want to use to save our log, standard error, and standard out files to
 log         = logs/bwa_test_job.log
 output      = logs/bwa_test_job.out
 error       = logs/bwa_test_job.error
 
+# Specify the JobDurationCategory of the job
 +JobDurationCategory = "Medium"
+
+# List any job requirements, as well as the resources we want available to our jobs. 
+requirements = (OSGVO_OS_STRING == "RHEL 7")
 request_cpus    = 1
 request_memory  = 2GB
 request_disk    = 1GB
 
-requirements = (OSGVO_OS_STRING == "RHEL 7")
-
+# Queue one job
 queue 1
 ```
+
 You will notice that the .log, .out, and .error files will be saved to a folder called `logs`. We need to create this folder using `mkdir logs` before we submit our job. 
 
 We will call the script for this analysis `bwa-test.sh` and it should contain the following information: 
@@ -185,7 +188,7 @@ cd ~/tutorial-bwa
 Now, we can create a new submit file called `bwa-alignment.sub` to queue a new job for each sample. To make it simpler to start, you can copy the `bwa-test.sub` file (`cp bwa-test.sub bwa-alignment.sub`) and modify it. 
 
 ```
-universe    = vanilla
+# File Name: bwa-test.sub
 executable  = bwa-alignment.sh
 arguments   = $(sample)
 
@@ -199,11 +202,11 @@ output      = logs/bwa_$(sample)_job.out
 error       = logs/bwa_$(sample)_job.error
 
 +JobDurationCategory = "Medium"
+
+requirements = (OSGVO_OS_STRING == "RHEL 7")
 request_cpus    = 1 
 request_memory  = 0.5GB
 request_disk    = 0.5GB
-
-requirements = (OSGVO_OS_STRING == "RHEL 7")
 
 queue sample from data/trimmed_fastq_small/samples.txt
 ```
